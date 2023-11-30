@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/NEXUS.iml" filepath="$PROJECT_DIR$/.idea/NEXUS.iml" />
+      <module fileurl="file://$PROJECT_DIR$/NEXUS.iml" filepath="$PROJECT_DIR$/NEXUS.iml" />
     </modules>
   </component>
 </project>
