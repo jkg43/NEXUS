@@ -109,7 +109,7 @@ public class TextInput extends ActivatableUIComponent
 	@Override
 	public void checkMouseAndActivate(int mx, int my,int button)
 	{
-		if(!(mx < x || my < y || mx > x + width || my > y + height))
+		if(isPointInside(mx,my))
 		{
 			ui.selectedComponent = this;
 			ui.in.typing = true;

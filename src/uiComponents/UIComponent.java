@@ -10,7 +10,9 @@ public abstract class UIComponent
 
 	public int x,y,width,height;
 
-	public boolean hidden = false;
+	public boolean isHidden = false;
+
+	public boolean isMovable = false;
 
 	protected UI ui;
 
@@ -23,6 +25,15 @@ public abstract class UIComponent
 	public UIComponent(UI u)
 	{
 		this.ui = u;
+	}
+
+	public boolean isPointInside(int px, int py) {
+		return !(px < x || py < y || px > x + width || py > y + height);
+	}
+
+	public void translate(int dx, int dy) {
+		x+=dx;
+		y+=dy;
 	}
 
 

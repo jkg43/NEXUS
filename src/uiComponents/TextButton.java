@@ -67,7 +67,7 @@ public class TextButton extends ActivatableUIComponent
 	public void update()
 	{
 		int mx = ui.in.mouseX,my = ui.in.mouseY;
-		if(mx>=x && my>=y && mx<=x+width && my<=y+height)
+		if(isPointInside(mx,my))
 		{
 			currentColor=hoverColor;
 			hovered = true;

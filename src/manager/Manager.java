@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public class Manager
 {
 
-	public static final String filePath = "C:/Users/jkg43/Desktop/Files/eclipse/NEXUS";
+	public static final String filePath = "C:/Users/jkg43/Desktop/Files/NEXUS";
 
 	public static final String dataPath = filePath + "/data";
 

@@ -40,10 +40,10 @@ public class Checklist extends UIComponent
 			TextInput ti = (TextInput)t;
 			cl.add(ti.builder.toString(),false);
 			cl.adding = false;
-			ti.hidden = true;
+			ti.isHidden = true;
 			ti.clear();
 		},this);
-		textIn.hidden = true;
+		textIn.isHidden = true;
 		u.globalComponents.add(textIn);
 	}
 
@@ -143,7 +143,7 @@ public class Checklist extends UIComponent
 		{
 			if(button == 1 && !removing)
 			{
-				textIn.hidden = adding;
+				textIn.isHidden = adding;
 				adding = !adding;
 				if(adding)
 				{

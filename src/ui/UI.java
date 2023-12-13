@@ -1,8 +1,11 @@
 package ui;
 
+import manager.CameraModule2D;
 import manager.Manager;
 import modules.ChecklistModule;
-import uiComponents.*;
+import modules.TreeGraphModule;
+import uiComponents.ModuleSelector;
+import uiComponents.UIComponent;
 
 import javax.swing.*;
 import java.awt.*;
@@ -32,14 +35,13 @@ public class UI extends JPanel implements ActionListener
 	{
 		globalComponents = new ArrayList<>();
 
-
-		ChecklistModule checklistMod = new ChecklistModule(this, "Checklist 1");
-		ChecklistModule checklistMod2 = new ChecklistModule(this, "Checklist 2");
+		ChecklistModule checklistMod = new ChecklistModule(this, "Checklist");
+		TreeGraphModule treeMod = new TreeGraphModule(this, "Tree Graph");
 
 
 		m.modules.add(checklistMod);
-		m.modules.add(checklistMod2);
-		m.currentModule = checklistMod;
+		m.modules.add(treeMod);
+		m.currentModule = treeMod;
 
 		selector = new ModuleSelector(this);
 		globalComponents.add(selector);
@@ -68,7 +70,7 @@ public class UI extends JPanel implements ActionListener
 
 		for(UIComponent c : globalComponents)
 		{
-			if(!c.hidden)
+			if(!c.isHidden)
 			{
 				c.draw(g2d);
 			}
@@ -86,7 +88,8 @@ public class UI extends JPanel implements ActionListener
 		String[] debugInfo = {
 			"M: "+in.mouseX+", "+in.mouseY,
 			"T: "+in.typing,
-			"SN: "+(selectedComponent==null)
+			"SC: "+(selectedComponent!=null),
+			"HC: "+(m.currentModule instanceof CameraModule2D cam ? cam.hoveredComponent!=null: "N/A")
 		};
 
 		int yPos = HEIGHT-10;
@@ -172,6 +175,7 @@ public class UI extends JPanel implements ActionListener
 		addMouseMotionListener(in);
 		addKeyListener(in);
 		addMouseListener(in);
+		addMouseWheelListener(in);
 		t.start();
 		init();
 	}

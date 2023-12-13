@@ -11,6 +11,12 @@ public abstract class Module
 
 	public ArrayList<UIComponent> components;
 
+	//will be added to the component list after every update cycle
+	public ArrayList<UIComponent> componentsToAdd;
+
+	//will be removed from the component list after every update cycle
+	public ArrayList<UIComponent> componentsToRemove;
+
 	public UI u;
 
 	public String modulePath;
@@ -23,6 +29,10 @@ public abstract class Module
 		{
 			c.update();
 		}
+		components.addAll(componentsToAdd);
+		components.removeAll(componentsToRemove);
+		componentsToAdd.clear();
+		componentsToRemove.clear();
 	}
 
 
@@ -30,7 +40,7 @@ public abstract class Module
 	{
 		for(UIComponent c : components)
 		{
-			if(!c.hidden)
+			if(!c.isHidden)
 			{
 				c.draw(g2d);
 			}
@@ -41,6 +51,8 @@ public abstract class Module
 	public Module(UI u, String name,String modulePath)
 	{
 		this.components = new ArrayList<>();
+		this.componentsToAdd = new ArrayList<>();
+		this.componentsToRemove = new ArrayList<>();
 		this.u = u;
 		this.name = name;
 		this.modulePath = Manager.dataPath + modulePath;

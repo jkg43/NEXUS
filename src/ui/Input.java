@@ -1,14 +1,12 @@
 package ui;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 
+import manager.CameraModule2D;
 import uiComponents.TextInput;
 import uiComponents.UIComponent;
 
-public class Input implements KeyListener,MouseListener,MouseMotionListener
+import java.awt.event.*;
+
+public class Input implements KeyListener,MouseListener,MouseMotionListener, MouseWheelListener
 {
 
 	public int mouseX=-10000,mouseY=-10000;
@@ -26,8 +24,14 @@ public class Input implements KeyListener,MouseListener,MouseMotionListener
 	@Override
 	public void mouseDragged(MouseEvent e)
 	{
+		int dx = e.getX() - mouseX;
+		int dy = e.getY() - mouseY;
+
 		mouseX = e.getX();
 		mouseY = e.getY();
+		if(u.m.currentModule instanceof CameraModule2D cam) {
+			cam.processMouseDrag(dx,dy);
+		}
 	}
 
 	@Override
@@ -42,17 +46,9 @@ public class Input implements KeyListener,MouseListener,MouseMotionListener
 	{
 		mouseX = e.getX();
 		mouseY = e.getY();
-	}
-
-	@Override
-	public void mousePressed(MouseEvent e)
-	{
-		mouseX = e.getX();
-		mouseY = e.getY();
 
 		typing = false;
 		u.selectedComponent=null;
-
 
 		for(UIComponent c : u.globalComponents)
 		{
@@ -65,9 +61,16 @@ public class Input implements KeyListener,MouseListener,MouseMotionListener
 			{
 				c.checkMouseAndActivate(mouseX,mouseY,e.getButton());
 			}
+
 		}
 
+	}
 
+	@Override
+	public void mousePressed(MouseEvent e)
+	{
+		mouseX = e.getX();
+		mouseY = e.getY();
 	}
 
 	@Override
@@ -75,6 +78,10 @@ public class Input implements KeyListener,MouseListener,MouseMotionListener
 	{
 		mouseX = e.getX();
 		mouseY = e.getY();
+
+		if(u.m.currentModule instanceof CameraModule2D cam) {
+			cam.draggedComponent = null;
+		}
 	}
 
 	@Override
@@ -122,12 +129,12 @@ public class Input implements KeyListener,MouseListener,MouseMotionListener
 		{
 			switch(e.getKeyCode())
 			{
-				case KeyEvent.VK_D:
+				case KeyEvent.VK_G:
 					u.drawDebug = !u.drawDebug;
 					break;
-				case KeyEvent.VK_S:
-
-					break;
+			}
+			if(u.m.currentModule instanceof CameraModule2D cam) {
+				cam.processKeyCode(e.getKeyCode());
 			}
 		}
 		else
@@ -156,8 +163,23 @@ public class Input implements KeyListener,MouseListener,MouseMotionListener
 
 	}
 
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent e) {
+		int rotation = e.getWheelRotation();
+		if(u.m.currentModule instanceof CameraModule2D cam) {
+			double scaleFactor;
+			if(rotation < 0) {
+				scaleFactor = 1.1;
+				rotation = -rotation;
+			} else {
+				scaleFactor = 1.0/1.1;
+			}
+			for (int i = 0; i < rotation; i++) {
+				cam.scaleAroundPoint(scaleFactor, mouseX, mouseY);
+			}
+		}
 
-
+	}
 
 
 }
