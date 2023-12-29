@@ -18,7 +18,7 @@ import java.util.ArrayList;
 public class UI extends JPanel implements ActionListener
 {
 	public final int HEIGHT=600,WIDTH=800;
-	public boolean drawDebug = true;
+	public boolean drawDebug = false;
 
 	public final Manager m;
 
@@ -189,7 +189,7 @@ public class UI extends JPanel implements ActionListener
 			UI u = new UI(m);
 
 			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			setTitle("UI");
+			setTitle("NEXUS");
 
 			add(u);
 			pack();

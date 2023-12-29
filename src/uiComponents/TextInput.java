@@ -105,6 +105,16 @@ public class TextInput extends ActivatableUIComponent
 		cursorPos = 0;
 	}
 
+	public String getText() {
+		return builder.toString();
+	}
+
+	@Override
+	public void destroy() {
+		super.destroy();
+		ui.in.typing = false;
+	}
+
 
 	@Override
 	public void checkMouseAndActivate(int mx, int my,int button)

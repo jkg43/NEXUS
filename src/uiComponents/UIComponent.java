@@ -36,5 +36,11 @@ public abstract class UIComponent
 		y+=dy;
 	}
 
+	public void destroy() {
+		if(ui.selectedComponent==this) {
+			ui.selectedComponent = null;
+		}
+	}
+
 
 }

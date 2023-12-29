@@ -29,8 +29,14 @@ public abstract class Module
 		{
 			c.update();
 		}
+
 		components.addAll(componentsToAdd);
+
+		for(UIComponent c : componentsToRemove) {
+			c.destroy();
+		}
 		components.removeAll(componentsToRemove);
+
 		componentsToAdd.clear();
 		componentsToRemove.clear();
 	}
@@ -57,6 +63,7 @@ public abstract class Module
 		this.name = name;
 		this.modulePath = Manager.dataPath + modulePath;
 	}
+
 
 
 

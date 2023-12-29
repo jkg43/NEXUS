@@ -30,7 +30,7 @@ public class Input implements KeyListener,MouseListener,MouseMotionListener, Mou
 		mouseX = e.getX();
 		mouseY = e.getY();
 		if(u.m.currentModule instanceof CameraModule2D cam) {
-			cam.processMouseDrag(dx,dy);
+			cam.processMouseDrag(dx,dy,e);
 		}
 	}
 
@@ -60,6 +60,11 @@ public class Input implements KeyListener,MouseListener,MouseMotionListener, Mou
 			for(UIComponent c : u.m.currentModule.components)
 			{
 				c.checkMouseAndActivate(mouseX,mouseY,e.getButton());
+			}
+			if(u.m.currentModule instanceof CameraModule2D cam) {
+				for(UIComponent c : cam.staticComponents) {
+					c.checkMouseAndActivate(mouseX,mouseY,e.getButton());
+				}
 			}
 
 		}

@@ -3,15 +3,18 @@ package manager;
 import ui.UI;
 import uiComponents.UIComponent;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 
 public class CameraModule2D extends Module {
 
-    private AffineTransform camTransform;
+    private final AffineTransform camTransform;
     private static final double DEFAULT_MOVE_SPEED = 10;
     private double moveSpeed = DEFAULT_MOVE_SPEED;
 
@@ -21,9 +24,13 @@ public class CameraModule2D extends Module {
 
     public UIComponent draggedComponent = null;
 
+    public ArrayList<UIComponent> staticComponents;
+
+
     public CameraModule2D(UI u, String name, String modulePath) {
         super(u, name, modulePath);
         camTransform = new AffineTransform();
+        staticComponents = new ArrayList<>();
     }
 
     public void processKeyCode(int code) {
@@ -35,15 +42,17 @@ public class CameraModule2D extends Module {
         }
     }
 
-    public void processMouseDrag(int dx, int dy) {
-        double moveFactor = moveSpeed / DEFAULT_MOVE_SPEED;
-        if(draggedComponent == null && hoveredComponent != null) {
-            draggedComponent = hoveredComponent;
-        }
-        if(hoveredComponent == null || !hoveredComponent.isMovable) {
-            camTransform.translate(dx * moveFactor,dy * moveFactor);
-        } else {
-            draggedComponent.translate((int) (dx * moveFactor), (int) (dy * moveFactor));
+    public void processMouseDrag(int dx, int dy, MouseEvent e) {
+        if(SwingUtilities.isLeftMouseButton(e)) {
+            double moveFactor = moveSpeed / DEFAULT_MOVE_SPEED;
+            if(draggedComponent == null && hoveredComponent != null) {
+                draggedComponent = hoveredComponent;
+            }
+            if(hoveredComponent == null || !hoveredComponent.isMovable) {
+                camTransform.translate(dx * moveFactor,dy * moveFactor);
+            } else {
+                draggedComponent.translate((int) (dx * moveFactor), (int) (dy * moveFactor));
+            }
         }
     }
 
@@ -70,6 +79,12 @@ public class CameraModule2D extends Module {
         super.draw(g2d);
 
         g2d.setTransform(oldTransform);
+
+        for(UIComponent c : staticComponents) {
+            if(!c.isHidden) {
+                c.draw(g2d);
+            }
+        }
     }
 
     @Override
@@ -104,6 +119,10 @@ public class CameraModule2D extends Module {
         }
 
         super.update();
+
+        for(UIComponent c : staticComponents) {
+            c.update();
+        }
     }
 
 }
