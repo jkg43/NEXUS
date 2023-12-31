@@ -11,14 +11,14 @@ public class Input implements KeyListener,MouseListener,MouseMotionListener, Mou
 
 	public int mouseX=-10000,mouseY=-10000;
 
-	private final UI u;
+	private final UI ui;
 
 	public boolean typing = false;
 
 
 	public Input(UI u)
 	{
-		this.u = u;
+		this.ui = u;
 	}
 
 	@Override
@@ -29,7 +29,7 @@ public class Input implements KeyListener,MouseListener,MouseMotionListener, Mou
 
 		mouseX = e.getX();
 		mouseY = e.getY();
-		if(u.m.currentModule instanceof CameraModule2D cam) {
+		if(ui.m.currentModule instanceof CameraModule2D cam) {
 			cam.processMouseDrag(dx,dy,e);
 		}
 	}
@@ -48,26 +48,34 @@ public class Input implements KeyListener,MouseListener,MouseMotionListener, Mou
 		mouseY = e.getY();
 
 		typing = false;
-		u.selectedComponent=null;
+		ui.selectedComponent=null;
 
-		for(UIComponent c : u.globalComponents)
+		for(UIComponent c : ui.globalComponents)
 		{
 			c.checkMouseAndActivate(mouseX, mouseY,e.getButton());
 		}
 
-		if(!u.selector.menuHovered())
-		{
-			for(UIComponent c : u.m.currentModule.components)
+
+
+		if(ui.contextMenuHovered()) {
+			ui.currentContextMenu.checkMouseAndActivate(mouseX,mouseY,e.getButton());
+		} else {
+			ui.currentContextMenu = null;
+			if(!ui.selector.menuHovered())
 			{
-				c.checkMouseAndActivate(mouseX,mouseY,e.getButton());
-			}
-			if(u.m.currentModule instanceof CameraModule2D cam) {
-				for(UIComponent c : cam.staticComponents) {
+				for(UIComponent c : ui.m.currentModule.components)
+				{
 					c.checkMouseAndActivate(mouseX,mouseY,e.getButton());
 				}
+				if(ui.m.currentModule instanceof CameraModule2D cam) {
+					for(UIComponent c : cam.staticComponents) {
+						c.checkMouseAndActivate(mouseX,mouseY,e.getButton());
+					}
+				}
 			}
-
 		}
+
+
 
 	}
 
@@ -84,7 +92,7 @@ public class Input implements KeyListener,MouseListener,MouseMotionListener, Mou
 		mouseX = e.getX();
 		mouseY = e.getY();
 
-		if(u.m.currentModule instanceof CameraModule2D cam) {
+		if(ui.m.currentModule instanceof CameraModule2D cam) {
 			cam.draggedComponent = null;
 		}
 	}
@@ -108,7 +116,7 @@ public class Input implements KeyListener,MouseListener,MouseMotionListener, Mou
 	{
 		if(typing)
 		{
-			if(u.selectedComponent instanceof TextInput t && e.getKeyChar()!='\n')
+			if(ui.selectedComponent instanceof TextInput t && e.getKeyChar()!='\n')
 			{
 				if(e.getKeyChar()==KeyEvent.VK_BACK_SPACE)
 				{
@@ -135,16 +143,16 @@ public class Input implements KeyListener,MouseListener,MouseMotionListener, Mou
 			switch(e.getKeyCode())
 			{
 				case KeyEvent.VK_G:
-					u.drawDebug = !u.drawDebug;
+					ui.drawDebug = !ui.drawDebug;
 					break;
 			}
-			if(u.m.currentModule instanceof CameraModule2D cam) {
+			if(ui.m.currentModule instanceof CameraModule2D cam) {
 				cam.processKeyCode(e.getKeyCode());
 			}
 		}
 		else
 		{
-			if(u.selectedComponent instanceof TextInput t)
+			if(ui.selectedComponent instanceof TextInput t)
 			{
 				switch(e.getKeyCode())
 				{
@@ -171,7 +179,7 @@ public class Input implements KeyListener,MouseListener,MouseMotionListener, Mou
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		int rotation = e.getWheelRotation();
-		if(u.m.currentModule instanceof CameraModule2D cam) {
+		if(ui.m.currentModule instanceof CameraModule2D cam) {
 			double scaleFactor;
 			if(rotation < 0) {
 				scaleFactor = 1.1;

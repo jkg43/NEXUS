@@ -4,6 +4,7 @@ import manager.CameraModule2D;
 import manager.Manager;
 import modules.ChecklistModule;
 import modules.TreeGraphModule;
+import uiComponents.ContextMenu;
 import uiComponents.ModuleSelector;
 import uiComponents.UIComponent;
 
@@ -30,20 +31,22 @@ public class UI extends JPanel implements ActionListener
 
 	public ModuleSelector selector;
 
+	public ContextMenu currentContextMenu = null;
+
 
 	private void init()
 	{
 		globalComponents = new ArrayList<>();
 
-		ChecklistModule checklistMod = new ChecklistModule(this, "Checklist");
-		TreeGraphModule treeMod = new TreeGraphModule(this, "Tree Graph");
+		ChecklistModule checklistMod = new ChecklistModule( "Checklist");
+		TreeGraphModule treeMod = new TreeGraphModule( "Tree Graph");
 
 
 		m.modules.add(checklistMod);
 		m.modules.add(treeMod);
 		m.currentModule = treeMod;
 
-		selector = new ModuleSelector(this);
+		selector = new ModuleSelector();
 		globalComponents.add(selector);
 	}
 
@@ -59,14 +62,28 @@ public class UI extends JPanel implements ActionListener
 
 		m.currentModule.update();
 
+		if(currentContextMenu!=null) {
+			currentContextMenu.update();
+		}
+
 	}
 
 
+	public boolean contextMenuHovered() {
+		if(currentContextMenu==null) {
+			return false;
+		}
+		return currentContextMenu.menuHovered();
+	}
 
 
 	private void draw(Graphics2D g2d)
 	{
 		m.currentModule.draw(g2d);
+
+		if(currentContextMenu!=null) {
+			currentContextMenu.draw(g2d);
+		}
 
 		for(UIComponent c : globalComponents)
 		{
@@ -89,7 +106,8 @@ public class UI extends JPanel implements ActionListener
 			"M: "+in.mouseX+", "+in.mouseY,
 			"T: "+in.typing,
 			"SC: "+(selectedComponent!=null),
-			"HC: "+(m.currentModule instanceof CameraModule2D cam ? cam.hoveredComponent!=null: "N/A")
+			"HC: "+(m.currentModule instanceof CameraModule2D cam ? cam.hoveredComponent!=null: "N/A"),
+			"CH: "+contextMenuHovered()
 		};
 
 		int yPos = HEIGHT-10;
@@ -168,6 +186,7 @@ public class UI extends JPanel implements ActionListener
 	public UI(Manager m)
 	{
 		this.m = m;
+		Manager.ui = this;
 		in = new Input(this);
 		setPreferredSize(new Dimension(WIDTH,HEIGHT));
 		setBackground(Color.LIGHT_GRAY);

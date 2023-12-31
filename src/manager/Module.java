@@ -17,7 +17,7 @@ public abstract class Module
 	//will be removed from the component list after every update cycle
 	public ArrayList<UIComponent> componentsToRemove;
 
-	public UI u;
+	public UI ui;
 
 	public String modulePath;
 
@@ -54,12 +54,12 @@ public abstract class Module
 	}
 
 
-	public Module(UI u, String name,String modulePath)
+	public Module(String name,String modulePath)
 	{
 		this.components = new ArrayList<>();
 		this.componentsToAdd = new ArrayList<>();
 		this.componentsToRemove = new ArrayList<>();
-		this.u = u;
+		this.ui = Manager.ui;
 		this.name = name;
 		this.modulePath = Manager.dataPath + modulePath;
 	}

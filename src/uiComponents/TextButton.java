@@ -1,11 +1,7 @@
 package uiComponents;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.util.function.Consumer;
-
-import ui.UI;
 
 public class TextButton extends ActivatableUIComponent
 {
@@ -19,10 +15,10 @@ public class TextButton extends ActivatableUIComponent
 	private boolean hovered = false;
 
 
-	public TextButton(UI u, int x, int y, int w, int h, String t, Color normalColor, Color hoverColor, Color textColor,
+	public TextButton(int x, int y, int w, int h, String t, Color normalColor, Color hoverColor, Color textColor,
 					  Consumer<ActivatableUIComponent> func, UIComponent... target)
 	{
-		super(u,func,target);
+		super(func,target);
 		this.x=x;
 		this.y=y;
 		height=h;
@@ -57,7 +53,7 @@ public class TextButton extends ActivatableUIComponent
 	@Override
 	public void checkMouseAndActivate(int mx,int my,int button)
 	{
-		if(mx>=x && my>=y && mx<=x+width && my<=y+height)
+		if(button == 1 && mx>=x && my>=y && mx<=x+width && my<=y+height)
 		{
 			activate();
 		}
@@ -67,7 +63,7 @@ public class TextButton extends ActivatableUIComponent
 	public void update()
 	{
 		int mx = ui.in.mouseX,my = ui.in.mouseY;
-		if(isPointInside(mx,my))
+		if(isPointInside(mx,my) && !ui.contextMenuHovered())
 		{
 			currentColor=hoverColor;
 			hovered = true;

@@ -1,10 +1,6 @@
 package uiComponents;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Polygon;
-
-import ui.UI;
+import java.awt.*;
 
 public class ChecklistItem extends UIComponent
 {
@@ -15,9 +11,9 @@ public class ChecklistItem extends UIComponent
 
 	Checklist checklist;
 
-	public ChecklistItem(UI u, Checklist cl, String text,boolean c)
+	public ChecklistItem(Checklist cl, String text,boolean c)
 	{
-		super(u);
+		super();
 		this.text = text;
 		checked = c;
 		checklist = cl;

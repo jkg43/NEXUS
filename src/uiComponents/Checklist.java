@@ -1,12 +1,9 @@
 package uiComponents;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.util.ArrayList;
-
 import tools.GraphicsTools;
-import ui.UI;
+
+import java.awt.*;
+import java.util.ArrayList;
 
 public class Checklist extends UIComponent
 {
@@ -26,16 +23,16 @@ public class Checklist extends UIComponent
 	public ArrayList<ChecklistItem> itemsToRemove;
 
 
-	public Checklist(UI u, int x,int y,String title)
+	public Checklist(int x,int y,String title)
 	{
-		super(u);
+		super();
 		items = new ArrayList<>();
 		itemsToRemove = new ArrayList<>();
 		this.x=x;
 		this.y=y;
 		this.title = title;
 
-		textIn = new TextInput(u, x, y, 100, 40, "",(t)->{
+		textIn = new TextInput(x, y, 100, 40, "",(t)->{
 			Checklist cl = (Checklist)t.targets[0];
 			TextInput ti = (TextInput)t;
 			cl.add(ti.builder.toString(),false);
@@ -44,13 +41,13 @@ public class Checklist extends UIComponent
 			ti.clear();
 		},this);
 		textIn.isHidden = true;
-		u.globalComponents.add(textIn);
+		ui.globalComponents.add(textIn);
 	}
 
 
 	public void add(String text,boolean checked)
 	{
-		items.add(new ChecklistItem(ui, this, text, checked));
+		items.add(new ChecklistItem(this, text, checked));
 	}
 
 	public void clear()

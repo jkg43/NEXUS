@@ -1,14 +1,13 @@
 package modules;
 
-import java.awt.*;
-
 import dataTypes.GoalsList;
 import fileIO.FileRead;
 import fileIO.FileSave;
-import ui.UI;
-import uiComponents.TextButton;
 import uiComponents.Checklist;
+import uiComponents.TextButton;
 import uiComponents.TextInput;
+
+import java.awt.*;
 
 public class ChecklistModule extends manager.Module {
 
@@ -17,9 +16,9 @@ public class ChecklistModule extends manager.Module {
     private GoalsList list;
 
 
-    public ChecklistModule(UI u, String name) {
-        super(u, name, "/checklist/");
-        Checklist checklist = new Checklist(u, 400, 200, "Test");
+    public ChecklistModule(String name) {
+        super(name, "/checklist/");
+        Checklist checklist = new Checklist(400, 200, "Test");
         components.add(checklist);
         GoalsList goalsList = new GoalsList();
         goalsList.add("Test 1", false);
@@ -29,11 +28,11 @@ public class ChecklistModule extends manager.Module {
 
         goalsList.loadIntoChecklist(checklist);
 
-        TextInput fileIn = new TextInput(u, 50, 10, 200, 40, defaultFilename, c -> System.out.println("Activated"));
+        TextInput fileIn = new TextInput(50, 10, 200, 40, defaultFilename, c -> System.out.println("Activated"));
 
         components.add(fileIn);
 
-        components.add(new TextButton(u, 50, 80, 250, 50, "Load data", Color.RED, new Color(250, 100, 100), Color.BLACK, (b) ->
+        components.add(new TextButton(50, 80, 250, 50, "Load data", Color.RED, new Color(250, 100, 100), Color.BLACK, (b) ->
         {
             System.out.println("Loading file...");
             list = FileRead.readGoalsListFile(modulePath + ((TextInput) b.targets[1]).builder.toString());
@@ -46,7 +45,7 @@ public class ChecklistModule extends manager.Module {
         }, checklist, fileIn));
 
         components.add(
-            new TextButton(u, 50, 180, 250, 50, "Save data", Color.GREEN, new Color(100, 225, 100), Color.BLACK, (b) ->
+            new TextButton(50, 180, 250, 50, "Save data", Color.GREEN, new Color(100, 225, 100), Color.BLACK, (b) ->
             {
                 System.out.println("Saving file...");
 

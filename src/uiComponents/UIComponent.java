@@ -2,6 +2,7 @@ package uiComponents;
 
 import java.awt.Graphics2D;
 
+import manager.Manager;
 import ui.UI;
 
 public abstract class UIComponent
@@ -22,9 +23,9 @@ public abstract class UIComponent
 
 	public abstract void checkMouseAndActivate(int mx,int my,int button);
 
-	public UIComponent(UI u)
+	public UIComponent()
 	{
-		this.ui = u;
+		this.ui = Manager.ui;
 	}
 
 	public boolean isPointInside(int px, int py) {

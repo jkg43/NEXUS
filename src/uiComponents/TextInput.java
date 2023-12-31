@@ -1,19 +1,16 @@
 package uiComponents;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.util.function.Consumer;
-
 import tools.StringTools;
-import ui.UI;
+
+import java.awt.*;
+import java.util.function.Consumer;
 
 public class TextInput extends ActivatableUIComponent
 {
 
 	public StringBuilder builder;
 
-	public int cursorPos=0;
+	public int cursorPos;
 
 	Font inputFont;
 
@@ -23,9 +20,9 @@ public class TextInput extends ActivatableUIComponent
 
 	private final Font font;
 
-	public TextInput(UI u,int x, int y, int w, int h,String disp,Consumer<ActivatableUIComponent> f,UIComponent... t)
+	public TextInput(int x, int y, int w, int h,String disp,Consumer<ActivatableUIComponent> f,UIComponent... t)
 	{
-		super(u,f,t);
+		super(f,t);
 		this.x=x;
 		this.y=y;
 		width = w;
@@ -34,6 +31,8 @@ public class TextInput extends ActivatableUIComponent
 		builder = new StringBuilder();
 		builder.append(disp);
 		minWidth = width;
+
+		cursorPos = disp.length();
 
 		font = new Font("arial",Font.PLAIN,height-10);
 	}
@@ -105,7 +104,8 @@ public class TextInput extends ActivatableUIComponent
 		cursorPos = 0;
 	}
 
-	public String getText() {
+	@Override
+	public String toString() {
 		return builder.toString();
 	}
 

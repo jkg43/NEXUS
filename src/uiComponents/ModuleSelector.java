@@ -1,7 +1,6 @@
 package uiComponents;
 
 import manager.Module;
-import ui.UI;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -20,9 +19,9 @@ public class ModuleSelector extends Button
 
     private boolean menuOpen = false, menuHovered = false;
 
-    public ModuleSelector(UI u)
+    public ModuleSelector()
     {
-        super(u,0,0,HEIGHT,HEIGHT,NORMAL, HOVERED, c -> {
+        super(0,0,HEIGHT,HEIGHT,NORMAL, HOVERED, c -> {
             ModuleSelector s = (ModuleSelector) c;
             s.toggleMenu();
         });
@@ -32,7 +31,7 @@ public class ModuleSelector extends Button
         {
             modules.add(new ModuleSelection(this,mod,modY,c->{
                 ModuleSelection s  = (ModuleSelection) c;
-                u.m.currentModule = s.module;
+                ui.m.currentModule = s.module;
                 s.selector.toggleMenu();
             }));
             modY+=HEIGHT;
@@ -52,11 +51,7 @@ public class ModuleSelector extends Button
     @Override
     public void update() {
         super.update();
-        menuHovered = false;
-        if(isHovered())
-        {
-            menuHovered = true;
-        }
+        menuHovered = isHovered();
         if(menuOpen)
         {
             for(ModuleSelection s : modules)
@@ -106,7 +101,7 @@ public class ModuleSelector extends Button
         public ModuleSelector selector;
 
         public ModuleSelection(ModuleSelector selector, Module module, int y, Consumer<ActivatableUIComponent> f) {
-            super(selector.ui,0,y,WIDTH,HEIGHT, module.name,NORMAL,HOVERED,Color.BLACK,f);
+            super(0,y,WIDTH,HEIGHT, module.name,NORMAL,HOVERED,Color.BLACK,f);
             this.module = module;
             this.selector = selector;
         }

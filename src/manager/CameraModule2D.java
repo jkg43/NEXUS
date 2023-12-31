@@ -1,6 +1,5 @@
 package manager;
 
-import ui.UI;
 import uiComponents.UIComponent;
 
 import javax.swing.*;
@@ -27,8 +26,8 @@ public class CameraModule2D extends Module {
     public ArrayList<UIComponent> staticComponents;
 
 
-    public CameraModule2D(UI u, String name, String modulePath) {
-        super(u, name, modulePath);
+    public CameraModule2D(String name, String modulePath) {
+        super(name, modulePath);
         camTransform = new AffineTransform();
         staticComponents = new ArrayList<>();
     }
@@ -53,6 +52,7 @@ public class CameraModule2D extends Module {
             } else {
                 draggedComponent.translate((int) (dx * moveFactor), (int) (dy * moveFactor));
             }
+            ui.currentContextMenu = null;
         }
     }
 
@@ -91,7 +91,7 @@ public class CameraModule2D extends Module {
     public void update() {
         Point2D translatePos = new Point();
         try {
-            camTransform.inverseTransform(new Point(u.in.mouseX, u.in.mouseY),translatePos);
+            camTransform.inverseTransform(new Point(ui.in.mouseX, ui.in.mouseY),translatePos);
         } catch (NoninvertibleTransformException e) {
             throw new RuntimeException(e);
         }
@@ -118,11 +118,27 @@ public class CameraModule2D extends Module {
             hoveredComponent = newHoveredComponent;
         }
 
-        super.update();
+        for(UIComponent c : components)
+        {
+            c.update();
+        }
 
         for(UIComponent c : staticComponents) {
             c.update();
         }
+
+        components.addAll(componentsToAdd);
+
+        for(UIComponent c : componentsToRemove) {
+            c.destroy();
+        }
+        components.removeAll(componentsToRemove);
+        staticComponents.removeAll(componentsToRemove);
+
+        componentsToAdd.clear();
+        componentsToRemove.clear();
+
+
     }
 
 }

@@ -1,7 +1,7 @@
 package modules;
 
 import manager.CameraModule2D;
-import ui.UI;
+import uiComponents.ContextMenu;
 import uiComponents.TextButton;
 import uiComponents.TextInput;
 import uiComponents.UIComponent;
@@ -20,10 +20,12 @@ public class TreeGraphModule extends CameraModule2D {
 
     TextInput fileSelector;
 
+    ContextMenu rmbMenu;
 
-    public TreeGraphModule(UI u, String name) {
-        super(u, name, "/tree/");
-        baseNode = new TreeNode(u,"Base test longer string");
+
+    public TreeGraphModule(String name) {
+        super(name, "/tree/");
+        baseNode = new TreeNode("Base test longer string");
         baseNode.x = 200;
         baseNode.y = 50;
         components.add(baseNode);
@@ -31,14 +33,15 @@ public class TreeGraphModule extends CameraModule2D {
         baseNode.addLeft("Left longer longer longer");
         baseNode.addRight("Right is a longer string");
 
-        TreeNodeSaveButton saveButton = new TreeNodeSaveButton(u);
+        TreeNodeSaveButton saveButton = new TreeNodeSaveButton();
         staticComponents.add(saveButton);
 
-        TreeNodeLoadButton loadButton = new TreeNodeLoadButton(u);
+        TreeNodeLoadButton loadButton = new TreeNodeLoadButton();
         staticComponents.add(loadButton);
 
-        fileSelector = new TextInput(u,0,u.HEIGHT-80,150,40,"test1.txt",(x)->{});
+        fileSelector = new TextInput(0,ui.HEIGHT-80,150,40,"test1.txt",(x)->{});
         staticComponents.add(fileSelector);
+
     }
 
 
@@ -51,19 +54,19 @@ public class TreeGraphModule extends CameraModule2D {
 
         private static final Stroke connectionStroke = new BasicStroke(3);
 
-        public TreeNode(UI u, String text) {
-            super(u);
+        public TreeNode(String text) {
+            super();
             this.text = text;
             this.width = -1;
             isMovable = true;
-            leftButton = new TreeNodeAddButton(u,this,true);
-            rightButton = new TreeNodeAddButton(u,this,false);
+            leftButton = new TreeNodeAddButton(this,true);
+            rightButton = new TreeNodeAddButton(this,false);
             componentsToAdd.add(leftButton);
             componentsToAdd.add(rightButton);
         }
 
         public void addLeft(String s) {
-            left = new TreeNode(ui,s);
+            left = new TreeNode(s);
             left.x = x - 100;
             left.y = y + 50;
             componentsToAdd.add(left);
@@ -72,7 +75,7 @@ public class TreeGraphModule extends CameraModule2D {
         }
 
         public void addRight(String s) {
-            right = new TreeNode(ui,s);
+            right = new TreeNode(s);
             right.x = x + 100;
             right.y = y + 50;
             componentsToAdd.add(right);
@@ -81,7 +84,7 @@ public class TreeGraphModule extends CameraModule2D {
         }
 
         public void addLeft() {
-            TextInput textIn = new TextInput(u,x + width / 4-50,y + height + 10,100,40,"",
+            TextInput textIn = new TextInput(x + width / 4-50,y + height + 10,100,40,"",
                 (x)->{
                     TextInput t = (TextInput) x;
                     TreeNode node = (TreeNode) t.targets[0];
@@ -92,12 +95,12 @@ public class TreeGraphModule extends CameraModule2D {
                     }
                 },this);
             componentsToAdd.add(textIn);
-            u.selectedComponent = textIn;
-            u.in.typing = true;
+            ui.selectedComponent = textIn;
+            ui.in.typing = true;
         }
 
         public void addRight() {
-            TextInput textIn = new TextInput(u,x + 3 * width / 4-50,y + height + 10,100,40,"",
+            TextInput textIn = new TextInput(x + 3 * width / 4-50,y + height + 10,100,40,"",
                 (x)->{
                     TextInput t = (TextInput) x;
                     TreeNode node = (TreeNode) t.targets[0];
@@ -108,8 +111,8 @@ public class TreeGraphModule extends CameraModule2D {
                     }
                 },this);
             componentsToAdd.add(textIn);
-            u.selectedComponent = textIn;
-            u.in.typing = true;
+            ui.selectedComponent = textIn;
+            ui.in.typing = true;
         }
 
         public void setText(String text) {
@@ -141,7 +144,7 @@ public class TreeGraphModule extends CameraModule2D {
         @Override
         public void translate(int dx, int dy) {
             super.translate(dx,dy);
-            if(u.selectedComponent==this) {
+            if(ui.selectedComponent==this) {
                 moveChildren(dx,dy);
             }
         }
@@ -167,10 +170,10 @@ public class TreeGraphModule extends CameraModule2D {
 
             if(ui.selectedComponent == this) {
                 g2d.setColor(Color.GRAY);
-                g2d.fillRect(x,y,width,height);
-            } else if (hoveredComponent == this) {
+                g2d.fillRect(x,y+10,width,height);
+            } else if (hoveredComponent == this && !ui.contextMenuHovered()) {
                 g2d.setColor(new Color(150,150,150));
-                g2d.fillRect(x,y,width,height);
+                g2d.fillRect(x,y+10,width,height);
             }
             g2d.setColor(Color.BLACK);
 
@@ -212,8 +215,24 @@ public class TreeGraphModule extends CameraModule2D {
                 if(button==1) {
                     ui.selectedComponent = this;
                 } else if(button==3) {
-                    //TODO - create rmb context menu w/ option to change text
-                    System.out.println("RMB Pressed on node with text: "+text);
+                    rmbMenu = new ContextMenu(mx,my,150,30);
+                    rmbMenu.addOption("Edit Text",(m)->{
+                        TextInput t = new TextInput(x,y+10,width,height,text,(c)->{
+                            TreeNode n = (TreeNode) c.targets[0];
+                            TextInput in = (TextInput) c;
+                            String s = in.toString();
+                            n.setText(s);
+                            componentsToRemove.add(in);
+                        },this);
+                        componentsToAdd.add(t);
+                        ui.selectedComponent = t;
+                        ui.in.typing = true;
+                    });
+                    rmbMenu.addOption("Option 2",(m)->{
+                        System.out.println("Option 2 pressed on node with text: "+text);
+                    });
+                    ui.currentContextMenu = rmbMenu;
+                    ui.selectedComponent = this;
                 }
             }
         }
@@ -228,8 +247,8 @@ public class TreeGraphModule extends CameraModule2D {
 
             public static int SIZE = 16;
 
-            public TreeNodeAddButton(UI u, TreeNode node, boolean left) {
-                super(u, node.x, node.y, SIZE, SIZE, new Color(140,140,140), new Color(120,120,120),
+            public TreeNodeAddButton(TreeNode node, boolean left) {
+                super(node.x, node.y, SIZE, SIZE, new Color(140,140,140), new Color(120,120,120),
                     c -> {
                         TreeNodeAddButton b = (TreeNodeAddButton) c;
                         if(b.left) {
@@ -277,8 +296,8 @@ public class TreeGraphModule extends CameraModule2D {
      */
 
     private class TreeNodeSaveButton extends TextButton {
-        public TreeNodeSaveButton(UI u) {
-            super(u, 0,u.HEIGHT-40,100,40,"Save",Color.green,Color.green.darker(),Color.black,
+        public TreeNodeSaveButton() {
+            super(0, TreeGraphModule.this.ui.HEIGHT-40,100,40,"Save",Color.green,Color.green.darker(),Color.black,
                 (x)->{
                     TreeNodeSaveButton b = (TreeNodeSaveButton) x;
                     b.saveFile();
@@ -287,7 +306,7 @@ public class TreeGraphModule extends CameraModule2D {
         }
 
         public void saveFile() {
-            String filepath = modulePath + fileSelector.getText();
+            String filepath = modulePath + fileSelector.toString();
 
 
             try (FileWriter out = new FileWriter(filepath)){
@@ -342,8 +361,8 @@ public class TreeGraphModule extends CameraModule2D {
 
     private class TreeNodeLoadButton extends TextButton {
 
-        public TreeNodeLoadButton(UI u) {
-            super(u, 100,u.HEIGHT-40,100,40,"Load",Color.red,Color.red.darker(),Color.black,
+        public TreeNodeLoadButton() {
+            super(100, TreeGraphModule.this.ui.HEIGHT-40,100,40,"Load",Color.red,Color.red.darker(),Color.black,
                 (x)->{
                     TreeNodeLoadButton b = (TreeNodeLoadButton) x;
                     b.loadFile();
@@ -352,7 +371,7 @@ public class TreeGraphModule extends CameraModule2D {
         }
 
         public void loadFile() {
-            String filepath = modulePath + fileSelector.getText();
+            String filepath = modulePath + fileSelector.toString();
 
             try(BufferedReader in = new BufferedReader(new FileReader(filepath))) {
                 //consume info lines
@@ -373,7 +392,7 @@ public class TreeGraphModule extends CameraModule2D {
                 }
 
                 if(!nodeData.isEmpty()) {
-                    TreeNode base = new TreeNode(u,nodeData.get(0).text);
+                    TreeNode base = new TreeNode(nodeData.get(0).text);
                     base.x = nodeData.get(0).x;
                     base.y = nodeData.get(0).y;
 

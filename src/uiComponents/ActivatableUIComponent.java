@@ -2,8 +2,6 @@ package uiComponents;
 
 import java.util.function.Consumer;
 
-import ui.UI;
-
 public abstract class ActivatableUIComponent extends UIComponent
 {
 
@@ -13,9 +11,9 @@ public abstract class ActivatableUIComponent extends UIComponent
 	public UIComponent[] targets;
 
 
-	public ActivatableUIComponent(UI u,Consumer<ActivatableUIComponent> f,UIComponent... t)
+	public ActivatableUIComponent(Consumer<ActivatableUIComponent> f,UIComponent... t)
 	{
-		super(u);
+		super();
 		func = f;
 		targets = t;
 	}

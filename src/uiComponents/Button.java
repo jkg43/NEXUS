@@ -1,7 +1,5 @@
 package uiComponents;
 
-import ui.UI;
-
 import java.awt.*;
 import java.util.function.Consumer;
 
@@ -13,8 +11,8 @@ public class Button extends ActivatableUIComponent
     private boolean hovered = false;
 
 
-    public Button(UI u, int x, int y, int w, int h, Color normalColor, Color hoverColor, Consumer<ActivatableUIComponent> f, UIComponent... t) {
-        super(u, f, t);
+    public Button(int x, int y, int w, int h, Color normalColor, Color hoverColor, Consumer<ActivatableUIComponent> f, UIComponent... t) {
+        super(f, t);
         this.x=x;
         this.y=y;
         this.width=w;
@@ -31,7 +29,7 @@ public class Button extends ActivatableUIComponent
     @Override
     public void update() {
         int mx = ui.in.mouseX,my = ui.in.mouseY;
-        if(mx>=x && my>=y && mx<=x+width && my<=y+height)
+        if(isPointInside(mx,my) && !ui.contextMenuHovered())
         {
             currentColor=hoverColor;
             hovered = true;
