@@ -49,7 +49,7 @@ public class Button extends ActivatableUIComponent
 
     @Override
     public void checkMouseAndActivate(int mx, int my, int button) {
-        if(isPointInside(mx,my))
+        if(!isHidden && button == 1 && isPointInside(mx,my))
         {
             activate();
         }

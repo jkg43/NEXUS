@@ -53,7 +53,7 @@ public class TextButton extends ActivatableUIComponent
 	@Override
 	public void checkMouseAndActivate(int mx,int my,int button)
 	{
-		if(button == 1 && mx>=x && my>=y && mx<=x+width && my<=y+height)
+		if(!isHidden && button == 1 && isPointInside(mx,my))
 		{
 			activate();
 		}

@@ -25,7 +25,7 @@ public class TreeGraphModule extends CameraModule2D {
 
     public TreeGraphModule(String name) {
         super(name, "/tree/");
-        baseNode = new TreeNode("Base test longer string");
+        baseNode = new TreeNode("Base test longer string",null);
         baseNode.x = 200;
         baseNode.y = 50;
         components.add(baseNode);
@@ -47,17 +47,18 @@ public class TreeGraphModule extends CameraModule2D {
 
     private class TreeNode extends UIComponent
     {
-        public TreeNode left, right;
+        public TreeNode left, right, parent;
         public String text;
 
-        private TreeNodeAddButton leftButton,rightButton;
+        private final TreeNodeAddButton leftButton,rightButton;
 
         private static final Stroke connectionStroke = new BasicStroke(3);
 
-        public TreeNode(String text) {
+        public TreeNode(String text, TreeNode parent) {
             super();
             this.text = text;
             this.width = -1;
+            this.parent = parent;
             isMovable = true;
             leftButton = new TreeNodeAddButton(this,true);
             rightButton = new TreeNodeAddButton(this,false);
@@ -66,21 +67,19 @@ public class TreeGraphModule extends CameraModule2D {
         }
 
         public void addLeft(String s) {
-            left = new TreeNode(s);
+            left = new TreeNode(s,this);
             left.x = x - 100;
             left.y = y + 50;
             componentsToAdd.add(left);
-            componentsToRemove.add(leftButton);
-            leftButton = null;
+            leftButton.isHidden = true;
         }
 
         public void addRight(String s) {
-            right = new TreeNode(s);
+            right = new TreeNode(s,this);
             right.x = x + 100;
             right.y = y + 50;
             componentsToAdd.add(right);
-            componentsToRemove.add(rightButton);
-            rightButton = null;
+            rightButton.isHidden = true;
         }
 
         public void addLeft() {
@@ -194,18 +193,15 @@ public class TreeGraphModule extends CameraModule2D {
 
         }
 
-        public void removeAllChildren() {
+        public void removeWithChildren() {
+            componentsToRemove.add(this);
+            componentsToRemove.add(leftButton);
+            componentsToRemove.add(rightButton);
             if(left!=null) {
-                left.removeAllChildren();
-                componentsToRemove.add(left);
-            } else {
-                componentsToRemove.add(leftButton);
+                left.removeWithChildren();
             }
             if(right!=null) {
-                right.removeAllChildren();
-                componentsToRemove.add(right);
-            } else {
-                componentsToRemove.add(rightButton);
+                right.removeWithChildren();
             }
         }
 
@@ -228,15 +224,30 @@ public class TreeGraphModule extends CameraModule2D {
                         ui.selectedComponent = t;
                         ui.in.typing = true;
                     });
-                    rmbMenu.addOption("Option 2",(m)->{
-                        System.out.println("Option 2 pressed on node with text: "+text);
-                    });
+                    rmbMenu.addOption("Delete",(m)->{
+                        TreeNode n = (TreeNode) m.targets[0];
+                        n.removeWithChildren();
+
+                    },this);
                     ui.currentContextMenu = rmbMenu;
                     ui.selectedComponent = this;
                 }
             }
         }
 
+        @Override
+        public void destroy() {
+            if(parent!=null) {
+                if(parent.right==this) {
+                    parent.right = null;
+                    parent.rightButton.isHidden = false;
+                }
+                if(parent.left==this) {
+                    parent.left = null;
+                    parent.leftButton.isHidden = false;
+                }
+            }
+        }
 
 
         private class TreeNodeAddButton extends uiComponents.Button {
@@ -392,14 +403,13 @@ public class TreeGraphModule extends CameraModule2D {
                 }
 
                 if(!nodeData.isEmpty()) {
-                    TreeNode base = new TreeNode(nodeData.get(0).text);
+                    TreeNode base = new TreeNode(nodeData.get(0).text,null);
                     base.x = nodeData.get(0).x;
                     base.y = nodeData.get(0).y;
 
                     fillChildren(nodeData,nodeData.get(0),base);
 
-                    baseNode.removeAllChildren();
-                    componentsToRemove.add(baseNode);
+                    baseNode.removeWithChildren();
 
                     baseNode = base;
                     componentsToAdd.add(base);
