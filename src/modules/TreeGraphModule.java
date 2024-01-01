@@ -25,13 +25,13 @@ public class TreeGraphModule extends CameraModule2D {
 
     public TreeGraphModule(String name) {
         super(name, "/tree/");
-        baseNode = new TreeNode("Base test longer string",null);
+        baseNode = new TreeNode("Base node",null,false);
         baseNode.x = 200;
         baseNode.y = 50;
         components.add(baseNode);
 
-        baseNode.addLeft("Left longer longer longer");
-        baseNode.addRight("Right is a longer string");
+        baseNode.addLeft("Left node");
+        baseNode.addRight("Right node");
 
         TreeNodeSaveButton saveButton = new TreeNodeSaveButton();
         staticComponents.add(saveButton);
@@ -48,17 +48,19 @@ public class TreeGraphModule extends CameraModule2D {
     private class TreeNode extends UIComponent
     {
         public TreeNode left, right, parent;
+        public boolean isLeft;
         public String text;
 
         private final TreeNodeAddButton leftButton,rightButton;
 
         private static final Stroke connectionStroke = new BasicStroke(3);
 
-        public TreeNode(String text, TreeNode parent) {
+        public TreeNode(String text, TreeNode parent, boolean isLeft) {
             super();
             this.text = text;
             this.width = -1;
             this.parent = parent;
+            this.isLeft = isLeft;
             isMovable = true;
             leftButton = new TreeNodeAddButton(this,true);
             rightButton = new TreeNodeAddButton(this,false);
@@ -67,23 +69,21 @@ public class TreeGraphModule extends CameraModule2D {
         }
 
         public void addLeft(String s) {
-            left = new TreeNode(s,this);
-            left.x = x - 100;
-            left.y = y + 50;
+            left = new TreeNode(s,this,true);
+            setLeftPos(left,-50);
             componentsToAdd.add(left);
             leftButton.isHidden = true;
         }
 
         public void addRight(String s) {
-            right = new TreeNode(s,this);
-            right.x = x + 100;
-            right.y = y + 50;
+            right = new TreeNode(s,this,false);
+            setRightPos(right);
             componentsToAdd.add(right);
             rightButton.isHidden = true;
         }
 
         public void addLeft() {
-            TextInput textIn = new TextInput(x + width / 4-50,y + height + 10,100,40,"",
+            TextInput textIn = new TextInput(0,0,100,40,"",
                 (x)->{
                     TextInput t = (TextInput) x;
                     TreeNode node = (TreeNode) t.targets[0];
@@ -93,13 +93,14 @@ public class TreeGraphModule extends CameraModule2D {
                         componentsToRemove.add(t);
                     }
                 },this);
+            setLeftPos(textIn);
             componentsToAdd.add(textIn);
             ui.selectedComponent = textIn;
             ui.in.typing = true;
         }
 
         public void addRight() {
-            TextInput textIn = new TextInput(x + 3 * width / 4-50,y + height + 10,100,40,"",
+            TextInput textIn = new TextInput(0,0,100,40,"",
                 (x)->{
                     TextInput t = (TextInput) x;
                     TreeNode node = (TreeNode) t.targets[0];
@@ -109,6 +110,7 @@ public class TreeGraphModule extends CameraModule2D {
                         componentsToRemove.add(t);
                     }
                 },this);
+            setRightPos(textIn);
             componentsToAdd.add(textIn);
             ui.selectedComponent = textIn;
             ui.in.typing = true;
@@ -116,7 +118,7 @@ public class TreeGraphModule extends CameraModule2D {
 
         public void setText(String text) {
             this.text = text;
-            this.width = -1;
+            this.width = -2;
         }
 
         public Point2D getTopCenterPoint() {
@@ -140,6 +142,24 @@ public class TreeGraphModule extends CameraModule2D {
             }
         }
 
+        private void setRightPos(UIComponent c) {
+            setRightPos(c,0);
+        }
+
+        private void setLeftPos(UIComponent c) {
+            setLeftPos(c,0);
+        }
+
+        private void setRightPos(UIComponent c, int xOffset) {
+            c.x = x + 3 * width / 4 - 50 + xOffset;
+            c.y = y + height + 10;
+        }
+
+        private void setLeftPos(UIComponent c, int xOffset) {
+            c.x = x + width / 4 - 50 + xOffset;
+            c.y = y + height + 10;
+        }
+
         @Override
         public void translate(int dx, int dy) {
             super.translate(dx,dy);
@@ -151,18 +171,26 @@ public class TreeGraphModule extends CameraModule2D {
         @Override
         public void update() {
             if(left==null) {
-                leftButton.x = x + width / 4;
-                leftButton.y = y + height + 10;
+                setLeftPos(leftButton,50);
             }
             if(right==null) {
-                rightButton.x = x + 3 * width / 4;
-                rightButton.y = y + height + 10;
+                setRightPos(rightButton,50);
             }
         }
 
         @Override
         public void draw(Graphics2D g2d) {
             if(width==-1) {
+                width = g2d.getFontMetrics().stringWidth(text);
+                height = g2d.getFontMetrics().getHeight();
+                if(parent!=null && parent.width!=-1) {
+                    if(isLeft) {
+                        parent.setLeftPos(this,width/-2);
+                    } else {
+                        parent.setRightPos(this,width/2);
+                    }
+                }
+            } else if (width==-2) {
                 width = g2d.getFontMetrics().stringWidth(text);
                 height = g2d.getFontMetrics().getHeight();
             }
@@ -217,7 +245,9 @@ public class TreeGraphModule extends CameraModule2D {
                             TreeNode n = (TreeNode) c.targets[0];
                             TextInput in = (TextInput) c;
                             String s = in.toString();
-                            n.setText(s);
+                            if(!s.isBlank()) {
+                                n.setText(s);
+                            }
                             componentsToRemove.add(in);
                         },this);
                         componentsToAdd.add(t);
@@ -403,7 +433,7 @@ public class TreeGraphModule extends CameraModule2D {
                 }
 
                 if(!nodeData.isEmpty()) {
-                    TreeNode base = new TreeNode(nodeData.get(0).text,null);
+                    TreeNode base = new TreeNode(nodeData.get(0).text,null,false);
                     base.x = nodeData.get(0).x;
                     base.y = nodeData.get(0).y;
 
@@ -427,7 +457,7 @@ public class TreeGraphModule extends CameraModule2D {
             if(currentData.leftIndex!=-1) {
                 TreeNodeLoadData leftData = data.get(currentData.leftIndex);
                 currentNode.addLeft(leftData.text);
-
+                currentNode.left.isLeft = true;
                 fillChildren(data,leftData,currentNode.left);
             }
             if(currentData.rightIndex!=-1) {

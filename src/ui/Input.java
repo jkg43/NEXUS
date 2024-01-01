@@ -15,6 +15,8 @@ public class Input implements KeyListener,MouseListener,MouseMotionListener, Mou
 
 	public boolean typing = false;
 
+	private boolean ctrl = false, shift = false, alt = false;
+
 
 	public Input(UI u)
 	{
@@ -118,15 +120,14 @@ public class Input implements KeyListener,MouseListener,MouseMotionListener, Mou
 		{
 			if(ui.selectedComponent instanceof TextInput t && e.getKeyChar()!='\n')
 			{
-				if(e.getKeyChar()==KeyEvent.VK_BACK_SPACE)
+				if(e.getKeyChar()=='\b')
 				{
 					if(!t.builder.isEmpty() && t.cursorPos!=0)
 					{
 						t.builder.deleteCharAt(t.cursorPos-1);
 						t.moveCursor(-1);
 					}
-				}
-				else
+				} else if(!(ctrl || alt))
 				{
 					t.builder.insert(t.cursorPos, e.getKeyChar());
 					t.moveCursor(1);
@@ -140,12 +141,9 @@ public class Input implements KeyListener,MouseListener,MouseMotionListener, Mou
 	{
 		if(!typing)
 		{
-			switch(e.getKeyCode())
-			{
-				case KeyEvent.VK_G:
-					ui.drawDebug = !ui.drawDebug;
-					break;
-			}
+            switch (e.getKeyCode()) {
+                case KeyEvent.VK_L, KeyEvent.VK_G -> ui.drawDebug = !ui.drawDebug;
+            }
 			if(ui.m.currentModule instanceof CameraModule2D cam) {
 				cam.processKeyCode(e.getKeyCode());
 			}
@@ -154,26 +152,88 @@ public class Input implements KeyListener,MouseListener,MouseMotionListener, Mou
 		{
 			if(ui.selectedComponent instanceof TextInput t)
 			{
-				switch(e.getKeyCode())
-				{
-					case KeyEvent.VK_RIGHT:
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_RIGHT -> {
 						t.moveCursor(1);
-						break;
-					case KeyEvent.VK_LEFT:
+						if(ctrl) {
+							while(t.cursorPos!=t.builder.length() &&
+								!Character.isWhitespace(t.builder.charAt(t.cursorPos))) {
+								t.moveCursor(1);
+							}
+							while(t.cursorPos!=t.builder.length() &&
+								Character.isWhitespace(t.builder.charAt(t.cursorPos))) {
+								t.moveCursor(1);
+							}
+						}
+						if(shift) {
+							System.out.println("Select rightward"); //TODO
+						}
+					}
+                    case KeyEvent.VK_LEFT -> {
 						t.moveCursor(-1);
-						break;
-					case KeyEvent.VK_ENTER:
-						t.activate();
-						break;
-				}
+						if(ctrl) {
+							while(t.cursorPos!=0 && !Character.isWhitespace(t.builder.charAt(t.cursorPos))) {
+								t.moveCursor(-1);
+							}
+							while(t.cursorPos!=0 && Character.isWhitespace(t.builder.charAt(t.cursorPos-1))) {
+								t.moveCursor(-1);
+							}
+						}
+						if(shift) {
+							System.out.println("Select leftward");
+						}
+					}
+                    case KeyEvent.VK_UP -> t.cursorPos = 0;
+                    case KeyEvent.VK_DOWN -> t.cursorPos = t.builder.length();
+                    case KeyEvent.VK_ENTER -> t.activate();
+					case KeyEvent.VK_BACK_SPACE -> {
+						if(e.isControlDown()) {
+							while(!t.builder.isEmpty() && !Character.isWhitespace(t.builder.charAt(t.builder.length()-1))) {
+								if(t.cursorPos!=0)
+								{
+									t.builder.deleteCharAt(t.cursorPos-1);
+									t.moveCursor(-1);
+								} else {
+									break;
+								}
+							}
+							while(!t.builder.isEmpty() && Character.isWhitespace(t.builder.charAt(t.builder.length()-1))) {
+								if(t.cursorPos!=0)
+								{
+									t.builder.deleteCharAt(t.cursorPos-1);
+									t.moveCursor(-1);
+								} else {
+									break;
+								}
+							}
+						}
+					}
+                }
 			}
+		}
+		if(e.getKeyCode()==KeyEvent.VK_CONTROL) {
+			ctrl = true;
+		}
+		if(e.getKeyCode()==KeyEvent.VK_SHIFT) {
+			shift = true;
+		}
+		if(e.getKeyCode()==KeyEvent.VK_ALT) {
+			alt = true;
 		}
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e)
 	{
-
+		if(e.getKeyCode()==KeyEvent.VK_CONTROL) {
+			ctrl = false;
+		}
+		if(e.getKeyCode()==KeyEvent.VK_SHIFT) {
+			shift = false;
+		}
+		if(e.getKeyCode()==KeyEvent.VK_ALT) {
+			alt = false;
+		}
 	}
 
 	@Override
