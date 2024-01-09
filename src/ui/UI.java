@@ -1,5 +1,6 @@
 package ui;
 
+import bci.BCIModule;
 import manager.CameraModule2D;
 import manager.Manager;
 import modules.ChecklistModule;
@@ -40,11 +41,13 @@ public class UI extends JPanel implements ActionListener
 
 		ChecklistModule checklistMod = new ChecklistModule( "Checklist");
 		TreeGraphModule treeMod = new TreeGraphModule( "Tree Graph");
+		BCIModule bciMod = new BCIModule("BCI");
 
 
 		m.modules.add(checklistMod);
 		m.modules.add(treeMod);
-		m.currentModule = treeMod;
+		m.modules.add(bciMod);
+		m.currentModule = bciMod;
 
 		selector = new ModuleSelector();
 		globalComponents.add(selector);
