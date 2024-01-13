@@ -1,5 +1,6 @@
 package manager;
 
+import bci.BCIModule;
 import ui.UI;
 import ui.UI.UIWindow;
 
@@ -22,6 +23,9 @@ public class Manager
 	public void closeFunction()
 	{
 		System.out.println("Closing");
+		if(currentModule instanceof BCIModule bci) {
+			bci.running = false;
+		}
 	}
 
 

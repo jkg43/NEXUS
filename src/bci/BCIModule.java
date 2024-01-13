@@ -20,7 +20,7 @@ public class BCIModule extends Module {
 
     Integer[] asicEEGData = new Integer[8];
 
-    boolean running = false;
+    public boolean running = false;
 
     DataBar signalBar, attentionBar, meditationBar;
 
@@ -41,6 +41,8 @@ public class BCIModule extends Module {
         new Color(180, 111, 236),
         new Color(236, 93, 228)
     };
+
+    CycleGraph rawWaveGraph;
 
 
     public BCIModule(String name) {
@@ -85,6 +87,11 @@ public class BCIModule extends Module {
                 asicColors[i],0,0xFFFFFF,false);
             components.add(asicDataBars[i]);
         }
+
+        rawWaveGraph = new CycleGraph(500,150,800,250,1600,2048,-2048);
+
+        components.add(rawWaveGraph);
+
 
     }
 
@@ -146,13 +153,13 @@ public class BCIModule extends Module {
         InputStream input = null;
 
         public void run() {
+            String deviceAddress = "btspp://c464e3e6e013:1";
+
+            StreamConnection connection = null;
 
             try {
 
-                String deviceAddress = "btspp://c464e3e6e013:1";
-
-
-                StreamConnection connection = (StreamConnection) Connector.open(deviceAddress);
+                connection = (StreamConnection) Connector.open(deviceAddress);
 
                 if(connection==null) {
                     System.out.println("Could not connect to the device");
@@ -160,6 +167,7 @@ public class BCIModule extends Module {
                 } else {
                     System.out.println("Connection successful");
                 }
+
 
                 input = connection.openInputStream();
 
@@ -240,6 +248,7 @@ public class BCIModule extends Module {
                                                     }
 //                                                    System.out.println("Raw wave value: "+raw);
                                                     rawWaveValue = raw;
+                                                    rawWaveGraph.addValue(raw);
                                                     break;
                                                 case EEG_POWER:
                                                     float[] eegData = new float[8];
@@ -298,6 +307,15 @@ public class BCIModule extends Module {
             }
             catch(Exception e) {
                 e.printStackTrace();
+            }
+            finally {
+                if(connection!=null) {
+                    try {
+                        connection.close();
+                    } catch (IOException e) {
+                        System.out.println("Could not close the connection");
+                    }
+                }
             }
 
         }
