@@ -1,4 +1,4 @@
-package bci;
+package uiComponents;
 
 import uiComponents.UIComponent;
 

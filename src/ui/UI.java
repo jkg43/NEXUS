@@ -1,6 +1,7 @@
 package ui;
 
 import bci.BCIModule;
+import fourier.FourierTestModule;
 import manager.CameraModule2D;
 import manager.Manager;
 import modules.ChecklistModule;
@@ -11,15 +12,12 @@ import uiComponents.UIComponent;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.util.ArrayList;
 
 public class UI extends JPanel implements ActionListener
 {
-	public final int HEIGHT=600,WIDTH=800;
+	public int HEIGHT=600,WIDTH=800;
 	public boolean drawDebug = false;
 
 	public final Manager m;
@@ -42,12 +40,14 @@ public class UI extends JPanel implements ActionListener
 		ChecklistModule checklistMod = new ChecklistModule( "Checklist");
 		TreeGraphModule treeMod = new TreeGraphModule( "Tree Graph");
 		BCIModule bciMod = new BCIModule("BCI");
+		FourierTestModule fourierMod = new FourierTestModule("Fourier Test");
 
 
 		m.modules.add(checklistMod);
 		m.modules.add(treeMod);
 		m.modules.add(bciMod);
-		m.currentModule = bciMod;
+		m.modules.add(fourierMod);
+		m.currentModule = fourierMod;
 
 		selector = new ModuleSelector();
 		globalComponents.add(selector);
@@ -152,11 +152,11 @@ public class UI extends JPanel implements ActionListener
 
 
 
-
+	public final int FPS = 20;
 
 	Font defaultFont = new Font("arial", Font.PLAIN, 30);
 	BasicStroke defaultStroke = new BasicStroke(1);
-	Timer t = new Timer(50, this);
+	Timer t = new Timer(1000/FPS, this);
 	public Input in;
 
 	@Override
@@ -223,6 +223,17 @@ public class UI extends JPanel implements ActionListener
 					m.closeFunction();
 				}
 			});
+
+			addComponentListener(new ComponentAdapter() {
+				public void componentResized(ComponentEvent e) {
+					super.componentResized(e);
+					u.WIDTH = e.getComponent().getWidth();
+					u.HEIGHT = e.getComponent().getHeight();
+					System.out.println(u.WIDTH+", "+u.HEIGHT);
+				}
+			});
+
+
 
 			setVisible(true);
 		}

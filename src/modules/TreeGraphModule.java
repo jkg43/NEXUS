@@ -176,6 +176,8 @@ public class TreeGraphModule extends CameraModule2D {
             if(right==null) {
                 setRightPos(rightButton,50);
             }
+            fileSelector.y = ui.HEIGHT-117;
+
         }
 
         @Override
@@ -346,6 +348,11 @@ public class TreeGraphModule extends CameraModule2D {
                 });
         }
 
+        @Override
+        public void update() {
+            y = TreeGraphModule.this.ui.HEIGHT-77;
+        }
+
         public void saveFile() {
             String filepath = modulePath + fileSelector.toString();
 
@@ -409,6 +416,11 @@ public class TreeGraphModule extends CameraModule2D {
                     b.loadFile();
                     System.out.println("Loading Tree Module");
                 });
+        }
+
+        @Override
+        public void update() {
+            y = TreeGraphModule.this.ui.HEIGHT-77;
         }
 
         public void loadFile() {

@@ -1,6 +1,9 @@
 package bci;
 
+import fourier.FourierGraph;
 import manager.Module;
+import uiComponents.CycleGraph;
+import uiComponents.DataBar;
 import uiComponents.TextButton;
 
 import javax.bluetooth.BluetoothConnectionException;
@@ -44,6 +47,8 @@ public class BCIModule extends Module {
 
     CycleGraph rawWaveGraph;
 
+    FourierGraph fourierGraph;
+
 
     public BCIModule(String name) {
         super(name, "/bci/");
@@ -86,11 +91,18 @@ public class BCIModule extends Module {
             asicDataBars[i] = new DataBar(50+170*i,500,40,100,asicNames[i],
                 asicColors[i],0,0xFFFFFF,false);
             components.add(asicDataBars[i]);
+            asicDataBars[i].isHidden = true;
         }
 
-        rawWaveGraph = new CycleGraph(500,150,800,250,1600,2048,-2048);
+        int N = 400;
+
+        rawWaveGraph = new CycleGraph(500,150,800,250,N,-2048,2048);
 
         components.add(rawWaveGraph);
+
+        fourierGraph = new FourierGraph(500,500,800,250,N,1.0/512);
+
+        components.add(fourierGraph);
 
 
     }
@@ -114,6 +126,8 @@ public class BCIModule extends Module {
                 asicDataBars[i].updateValue(asicEEGData[i]);
             }
         }
+
+        fourierGraph.fourierUpdate(rawWaveGraph.getValues());
     }
 
 

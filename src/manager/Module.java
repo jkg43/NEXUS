@@ -54,6 +54,10 @@ public abstract class Module
 	}
 
 
+	/**
+	 * @param name module name
+	 * @param modulePath data directory path, with slashes on either side
+	 */
 	public Module(String name,String modulePath)
 	{
 		this.components = new ArrayList<>();
