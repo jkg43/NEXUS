@@ -29,10 +29,8 @@ public abstract class Graph extends UIComponent {
 
     @Override
     public void draw(Graphics2D g2d) {
-        g2d.setColor(Color.BLACK);
-        g2d.setStroke(new BasicStroke(3));
 
-        g2d.drawRect(x,y,width,height);
+        g2d.setStroke(new BasicStroke(3));
 
         g2d.setColor(new Color(208, 137, 12));
 
@@ -53,6 +51,10 @@ public abstract class Graph extends UIComponent {
             prevX = newX;
             prevY = newY;
         }
+
+        g2d.setColor(Color.BLACK);
+
+        g2d.drawRect(x,y,width,height);
     }
 
     private double getY(double val) {

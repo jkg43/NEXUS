@@ -47,7 +47,7 @@ public class UI extends JPanel implements ActionListener
 		m.modules.add(treeMod);
 		m.modules.add(bciMod);
 		m.modules.add(fourierMod);
-		m.currentModule = fourierMod;
+		m.currentModule = bciMod;
 
 		selector = new ModuleSelector();
 		globalComponents.add(selector);
@@ -229,7 +229,6 @@ public class UI extends JPanel implements ActionListener
 					super.componentResized(e);
 					u.WIDTH = e.getComponent().getWidth();
 					u.HEIGHT = e.getComponent().getHeight();
-					System.out.println(u.WIDTH+", "+u.HEIGHT);
 				}
 			});
 

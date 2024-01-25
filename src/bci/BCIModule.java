@@ -23,7 +23,9 @@ public class BCIModule extends Module {
 
     Integer[] asicEEGData = new Integer[8];
 
-    public boolean running = false;
+    boolean running = false;
+    final static int TIMEOUT_MS = 5000;
+    long connectionStartTime;
 
     DataBar signalBar, attentionBar, meditationBar;
 
@@ -65,11 +67,8 @@ public class BCIModule extends Module {
                 }
         }));
 
-        components.add(new TextButton(500,100,180,40,"Stop Data", Color.RED,Color.RED.darker(),Color.BLACK,
-            (x)-> {
-                System.out.println("Stopping data collection");
-                running = false;
-        }));
+        components.add(new TextButton(500,100,200,40,"Disconnect", Color.RED,Color.RED.darker(),Color.BLACK,
+            (x)-> disconnect()));
 
 
 
@@ -94,7 +93,7 @@ public class BCIModule extends Module {
             asicDataBars[i].isHidden = true;
         }
 
-        int N = 400;
+        int N = 512;
 
         rawWaveGraph = new CycleGraph(500,150,800,250,N,-2048,2048);
 
@@ -128,6 +127,11 @@ public class BCIModule extends Module {
         }
 
         fourierGraph.fourierUpdate(rawWaveGraph.getValues());
+
+        if(btData.connection != null && System.currentTimeMillis() - connectionStartTime > TIMEOUT_MS) {
+            System.out.println("No data received before timeout");
+            disconnect();
+        }
     }
 
 
@@ -149,6 +153,10 @@ public class BCIModule extends Module {
 //        g2d.drawString(asicEEG.toString(),50,400);
     }
 
+    public void disconnect() {
+        btData.disconnect();
+    }
+
     public class BluetoothStreamDataThread extends Thread {
 
         final int SYNC = 0xAA;
@@ -163,13 +171,15 @@ public class BCIModule extends Module {
         final int ASIC_EEG_POWER = 0x83; //len 24
         final int RR_INTERVAL = 0x86; //len 2
 
+        StreamConnection connection = null;
+
+
+
 
         InputStream input = null;
 
         public void run() {
             String deviceAddress = "btspp://c464e3e6e013:1";
-
-            StreamConnection connection = null;
 
             try {
 
@@ -182,6 +192,7 @@ public class BCIModule extends Module {
                     System.out.println("Connection successful");
                 }
 
+                connectionStartTime = System.currentTimeMillis();
 
                 input = connection.openInputStream();
 
@@ -189,6 +200,7 @@ public class BCIModule extends Module {
                 int[] payload = new int[256];
 
                 while(running) {
+                    connectionStartTime = System.currentTimeMillis();
                     int data = read();
 
                     if(data == SYNC) {
@@ -323,13 +335,7 @@ public class BCIModule extends Module {
                 e.printStackTrace();
             }
             finally {
-                if(connection!=null) {
-                    try {
-                        connection.close();
-                    } catch (IOException e) {
-                        System.out.println("Could not close the connection");
-                    }
-                }
+                disconnect();
             }
 
         }
@@ -344,6 +350,23 @@ public class BCIModule extends Module {
 
         private int read() throws IOException {
             return input.read();
+        }
+
+        public void disconnect() {
+            if(connection!=null) {
+                try {
+                    System.out.println("Disconnecting");
+                    input.close();
+                    connection.close();
+                    input = null;
+                    connection = null;
+                    running = false;
+                    Thread.currentThread().interrupt();
+                } catch (IOException e) {
+                    System.out.println("Could not close the connection");
+                }
+            }
+
         }
 
 

@@ -13,7 +13,7 @@ public class FourierGraph extends Graph {
 
     double dt,fs;
 
-    int numLabels = 6;
+    int numLabels = 9;
 
     private static final int F_LABEL_X_OFFSET = -25, F_LABEL_Y_OFFSET = 30,
         T_LABEL_X_OFFSET = 5, T_LABEL_Y_OFFSET = 10;
@@ -45,7 +45,13 @@ public class FourierGraph extends Graph {
         }
 
         for (int i = 0; i < N; i++) {
-            freqValues[i] = frequencies[i].modulus();
+            double mod = frequencies[i].modulus();
+            if(mod > 1) {
+                freqValues[i] = Math.log(mod);
+            } else {
+                freqValues[i] = 0;
+            }
+
         }
 
     }

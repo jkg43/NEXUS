@@ -24,7 +24,7 @@ public class Manager
 	{
 		System.out.println("Closing");
 		if(currentModule instanceof BCIModule bci) {
-			bci.running = false;
+			bci.disconnect();
 		}
 	}
 
